@@ -1,0 +1,4 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Itorrent</title></head>
+<body style="font:14px sans-serif;padding:16px"><pre id="o">…</pre><script>
+setInterval(function(){try{var r=JSON.parse(Android.call('poll','{}'));document.getElementById('o').textContent=JSON.stringify(r.r.s,null,1)+'\n'+r.r.t.map(function(t){return t.name+' '+(t.progress*100).toFixed(1)+'% '+t.state+' '+t.dl}).join('\n')}catch(e){document.getElementById('o').textContent=e}},1000);
+</script></body></html>

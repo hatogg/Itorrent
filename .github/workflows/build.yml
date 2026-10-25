@@ -1,0 +1,92 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['apk/**', 'README.md', 'docs/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Keystore
+        uses: actions/cache@v4
+        with:
+          path: itorrent.p12
+          key: itorrent-keystore-v1
+
+      - name: Prepare keystore
+        env:
+          KS_B64: ${{ secrets.ITORRENT_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then echo "$KS_B64" | base64 -d > itorrent.p12; fi
+          if [ ! -f itorrent.p12 ]; then
+            keytool -genkeypair -keystore itorrent.p12 -storetype PKCS12 -alias itorrent -keyalg RSA -keysize 2048 \
+              -validity 10000 -storepass itorrent-android -keypass itorrent-android -dname "CN=Itorrent, O=hatogg, C=UA"
+          fi
+
+      - name: Build APK
+        id: build
+        env:
+          STORE_PASS: ${{ secrets.ITORRENT_STORE_PASS || 'itorrent-android' }}
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon assembleDebug assembleRelease --stacktrace 2>&1 | tee build.log
+
+      - name: Enable KVM
+        if: success()
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Emulator check (real downloads + UI)
+        if: success()
+        continue-on-error: true
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: default
+          profile: pixel_6
+          ram-size: 4096M
+          disk-size: 6000M
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash ci/emulator-test.sh
+
+      - name: Publish results to ci branch
+        if: always()
+        run: |
+          mkdir -p out
+          cp build.log out/ 2>/dev/null || true
+          cp -r ci-out/* out/ 2>/dev/null || true
+          cp app/build/outputs/apk/release/*.apk out/Itorrent-release.apk 2>/dev/null || true
+          echo "sha=$GITHUB_SHA build=${{ steps.build.outcome }} run=$GITHUB_RUN_ID" > out/status.txt
+          cd out
+          git init -q
+          git checkout -q -b ci
+          git add -A
+          git -c user.name="github-actions" -c user.email="actions@github.com" commit -qm "CI $GITHUB_SHA"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Itorrent-apk
+          path: app/build/outputs/apk/release/*.apk

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Itorrent" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/chrome</item>
+        <item name="android:statusBarColor">@color/bar</item>
+        <item name="android:navigationBarColor">@color/chrome</item>
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+    <color name="chrome">#202020</color>
+    <color name="bar">#2B2B2B</color>
+    <color name="accent">#4493F8</color>
+</resources>
