@@ -171,6 +171,7 @@
     'add.links': (a) => { const n = a.text.split('\n').filter((x) => x.trim()).length; if (a.dialog) emit('preview', previewFor(/^magnet/.test(a.text.trim())), 300); return n; },
     'add.confirm': (a) => { rows.push(T('new' + Date.now(), pending[a.pid] || 'Новий торент', 700 * MiB, 0, 'downloading', { dl: 2 * MiB })); return null; },
     'add.cancel': () => null,
+    haptic: () => null,
     'clip.get': () => 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel',
     't.start': (a) => { for (const r of rows) if (a.ids.includes(r.id)) r.state = r.progress >= 1 ? 'stalledUP' : 'downloading'; },
     't.force': (a) => { for (const r of rows) if (a.ids.includes(r.id)) r.state = r.progress >= 1 ? 'forcedUP' : 'forcedDL'; },

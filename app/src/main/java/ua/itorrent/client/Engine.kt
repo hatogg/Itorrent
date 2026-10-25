@@ -1509,7 +1509,9 @@ object Engine {
     private fun debugDump() {
         runCatching {
             val dir = ctx.getExternalFilesDir(null) ?: return
-            File(dir, "state.json").writeText(JSONObject().put("s", sessionJson).put("t", rowsJson).toString(2))
+            val tr = JSONObject()
+            for (e in entries.values) runCatching { tr.put(displayName(e), Details.build(e, "trackers", "").optJSONObject("trackers")) }
+            File(dir, "state.json").writeText(JSONObject().put("s", sessionJson).put("t", rowsJson).put("tr", tr).toString(2))
             val sb = StringBuilder()
             synchronized(logs) { for (l in logs) sb.append(l.level).append(' ').append(l.msg).append('\n') }
             File(dir, "log.txt").writeText(sb.toString())

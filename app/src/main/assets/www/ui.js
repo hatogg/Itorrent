@@ -224,7 +224,7 @@
     el.addEventListener('pointerdown', (e) => {
       if (e.button > 0) return;
       fired = false; sx = e.clientX; sy = e.clientY;
-      t = setTimeout(() => { fired = true; t = null; if (navigator.vibrate) try { navigator.vibrate(12); } catch (x) {} onLong(e, { x: sx, y: sy }); }, 480);
+      t = setTimeout(() => { fired = true; t = null; try { window.Android.call('haptic', '{}'); } catch (x) {} onLong(e, { x: sx, y: sy }); }, 480);
     });
     const cancel = () => { if (t) { clearTimeout(t); t = null; } };
     el.addEventListener('pointermove', (e) => { if (t && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) cancel(); });

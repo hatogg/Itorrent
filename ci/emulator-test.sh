@@ -6,7 +6,10 @@ mkdir -p $OUT
 PKG=ua.itorrent.client
 ACT=$PKG/.MainActivity
 FILES=/sdcard/Android/data/$PKG/files
-T1="https://archive.org/download/testmp3testfile/testmp3testfile_archive.torrent"
+# Торент-файл Ubuntu Server з HTTPS-трекером (назву поточного випуску беремо зі сторінки релізів)
+UB=$(curl -sL https://releases.ubuntu.com/noble/ | grep -o 'ubuntu-24\.04[0-9.]*-live-server-amd64\.iso\.torrent' | head -1)
+T1="https://releases.ubuntu.com/noble/${UB:-ubuntu-24.04.3-live-server-amd64.iso.torrent}"
+echo "T1=$T1" > $OUT/sources.txt
 T2="magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F"
 js() { adb shell am start -n $ACT --es js "'$1'" > /dev/null; sleep ${2:-2}; }
 shot() { adb exec-out screencap -p > $OUT/$1.png; }
@@ -65,8 +68,11 @@ sleep 4
 shot 11_dark
 adb shell cmd uimode night no
 sleep 2
-# Перезапуск процесу: торенти мають відновитися з даних відновлення
-adb shell am force-stop $PKG
+# Вихід через меню: стан зберігається, процес завершується; далі торенти мають відновитися
+js "Android.call(\"exit\",\"{}\")" 1
+for i in $(seq 1 20); do adb shell pidof $PKG > /dev/null || break; sleep 1; done
+echo "after exit pid: $(adb shell pidof $PKG)" > $OUT/exit.txt
+adb shell run-as $PKG ls -la files/torrents >> $OUT/exit.txt 2>&1
 sleep 2
 adb shell am start -n $ACT
 sleep 12

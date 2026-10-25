@@ -398,6 +398,7 @@ class MainActivity : Activity() {
                 }
                 "ui.save" -> p.put("ui", a.optString("ui", "{}"))
                 "setBars" -> main.post { setBars(a.optBoolean("dark")) }
+                "haptic" -> main.post { web.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS) }
                 "add.file" -> main.post {
                     val i = Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*")
                         .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/x-bittorrent", "application/octet-stream", "*/*"))
