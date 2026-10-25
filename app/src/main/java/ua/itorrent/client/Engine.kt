@@ -227,6 +227,12 @@ object Engine {
     fun idOf(ih: info_hash_t): String = if (ih.has_v1()) ih.getV1().to_hex() else ih.get_best().to_hex()
     fun idOf(th: torrent_handle): String = idOf(th.info_hashes())
 
+    /** Власний (не прив'язаний до пам'яті події) дескриптор торента. */
+    private fun own(th: torrent_handle): torrent_handle? {
+        val h = sm.swig()?.find_torrent(th.info_hashes().get_best()) ?: return null
+        return if (h.is_valid()) h else null
+    }
+
     // ---------------------------------------------------------------- запуск і зупинка
 
     fun start() {
@@ -731,8 +737,9 @@ object Engine {
             emit("error", JSONObject().put("msg", msg))
             return
         }
-        val th = a.handle().swig()
-        val id = idOf(th)
+        // Дескриптор із події вказує на пам'ять події, яка звільняється після обробки, тож беремо власну копію.
+        val id = idOf(a.handle().swig())
+        val th = own(a.handle().swig()) ?: return
         val mf = metaFetch[id]
         if (mf != null) {
             mf.th = th

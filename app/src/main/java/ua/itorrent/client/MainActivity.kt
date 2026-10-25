@@ -47,6 +47,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Engine.init(this)
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("skipWelcome", false) == true) Engine.prefs.put("firstRunDone", true)
         TorrentService.start(this)
         web = WebView(this)
         val dark = isDark()
@@ -150,6 +151,7 @@ class MainActivity : Activity() {
 
     private fun handleIntent(i: Intent) {
         i.getStringExtra("select")?.let { send("select", JSONObject().put("id", it)) }
+        if (BuildConfig.DEBUG) i.getStringExtra("js")?.let { js -> web.evaluateJavascript(js, null) }
         if (BuildConfig.DEBUG) i.getStringExtra("autoAdd")?.let { link ->
             Engine.runIo {
                 Engine.awaitReady()
@@ -466,6 +468,10 @@ class MainActivity : Activity() {
                 "copy" -> {
                     val cm = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                     main.post { cm.setPrimaryClip(ClipData.newPlainText("Itorrent", a.optString("text"))) }
+                }
+                "clip.get" -> {
+                    val cm = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    return runCatching { cm.primaryClip?.getItemAt(0)?.coerceToText(this@MainActivity)?.toString() }.getOrNull() ?: ""
                 }
                 "share" -> main.post { startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, a.optString("text")), "Поділитися")) }
                 "openUrl" -> main.post { openUrl(a.optString("url")) }
