@@ -225,5 +225,6 @@
     });
   }
 
-  window.Rss = { show, refresh, back, rules };
+  function openFeed(url) { feedSel = url; artSel = null; render(); }
+  window.Rss = { show, refresh, back, rules, openFeed, state: () => ({ feedSel, artSel: artSel && artSel.id, feeds: data.feeds.length }) };
 })();

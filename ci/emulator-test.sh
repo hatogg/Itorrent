@@ -43,8 +43,10 @@ js "Android.call(\"create\",JSON.stringify({opts:{path:\"/storage/emulated/0/Dow
 js "Android.call(\"rss.addFeed\",JSON.stringify({url:\"https://distrowatch.com/news/torrents.xml\",name:\"DistroWatch\"}))" 15
 js "It.setTab(\"rss\")" 3
 shot 05_rss
-js "document.querySelectorAll(\".rss-feed\")[1].click()" 2
+js "document.querySelectorAll(\".rss-feed\")[1].click();console.log(\"rss-state \"+JSON.stringify(Rss.state()))" 3
 shot 05_rss_feed
+js "document.querySelector(\".rss-art\")&&document.querySelector(\".rss-art\").click();console.log(\"rss-state2 \"+JSON.stringify(Rss.state()))" 2
+shot 05_rss_article
 js "It.setTab(\"transfers\")" 1
 # Перегляд під час завантаження: локальний HTTP-сервер віддає діапазони байтів
 SPORT=$(grep -o '"sport": [0-9]*' $OUT/state.json | grep -o '[0-9]*$')
@@ -101,6 +103,6 @@ adb shell am start -a android.intent.action.VIEW -d "'$T2'" -n $ACT
 sleep 10
 shot 14_release_add
 adb logcat -d > $OUT/logcat_all.txt 2>&1 || true
-grep -iE "itorrent|libtorrent|AndroidRuntime|FATAL|chromium|has died|UnsatisfiedLink|DEBUG   :" $OUT/logcat_all.txt | grep -v AppsFilter | tail -500 > $OUT/logcat.txt || true
+grep -iE "itorrent|libtorrent|AndroidRuntime|FATAL|chromium|has died|UnsatisfiedLink|DEBUG   :|ItorrentJS" $OUT/logcat_all.txt | grep -v AppsFilter | tail -500 > $OUT/logcat.txt || true
 rm -f $OUT/logcat_all.txt
 exit 0

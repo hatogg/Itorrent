@@ -36,6 +36,7 @@ class MainActivity : Activity() {
     @Volatile private var ready = false
     private val pending = ArrayList<Intent>()
     private var lastStorage: Boolean? = null
+    private var lastDark: Boolean? = null
 
     companion object {
         const val REQ_TORRENT = 10
@@ -57,7 +58,15 @@ class MainActivity : Activity() {
         web.settings.domStorageEnabled = true
         web.settings.allowFileAccess = true
         web.settings.textZoom = 100
-        web.webChromeClient = WebChromeClient()
+        web.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(m: android.webkit.ConsoleMessage): Boolean {
+                if (BuildConfig.DEBUG || m.messageLevel() == android.webkit.ConsoleMessage.MessageLevel.ERROR) {
+                    android.util.Log.i("ItorrentJS", "${m.message()} (${m.sourceId()?.substringAfterLast('/')}:${m.lineNumber()})")
+                }
+                if (m.messageLevel() == android.webkit.ConsoleMessage.MessageLevel.ERROR) Engine.log(2, "Інтерфейс: ${m.message()}")
+                return true
+            }
+        }
         web.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 ready = true
@@ -87,17 +96,24 @@ class MainActivity : Activity() {
         if (ready) handleIntent(intent) else pending.add(intent)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         web.onPause()
         web.pauseTimers()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         web.resumeTimers()
         web.onResume()
+    }
+
+    override fun onResume() {
+        super.onResume()
         checkStorage()
+        val d = systemDark()
+        if (lastDark != null && lastDark != d) send("theme", JSONObject().put("dark", d))
+        lastDark = d
     }
 
     private fun checkStorage() {
@@ -116,7 +132,9 @@ class MainActivity : Activity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        send("theme", JSONObject().put("dark", systemDark()))
+        val d = (newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        lastDark = d
+        send("theme", JSONObject().put("dark", d))
     }
 
     private fun send(type: String, data: JSONObject) {

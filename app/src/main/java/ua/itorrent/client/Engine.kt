@@ -259,7 +259,6 @@ object Engine {
             ?: SessionParams()
         params.setSettings(sp)
         params.setPosixDiskIO()
-        installCaBundle()
         sm.addListener(listener)
         sm.start(params)
         sm.applySettings(settingsPack())
@@ -274,40 +273,6 @@ object Engine {
         rss.start()
         ticker = exec.scheduleWithFixedDelay({ tick() }, 1000, 1000, TimeUnit.MILLISECONDS)
         readyLatch.countDown()
-    }
-
-    /**
-     * Вбудований у libtorrent OpenSSL не знає, де Android тримає кореневі сертифікати,
-     * тож HTTPS-трекери й веб-сіди не проходили б перевірку. Збираємо системні сертифікати
-     * в один PEM-файл і показуємо його OpenSSL через SSL_CERT_FILE.
-     */
-    private fun installCaBundle() {
-        try {
-            val f = File(ctx.filesDir, "cacert.pem")
-            if (!f.exists() || f.length() < 1000 || System.currentTimeMillis() - f.lastModified() > 3L * 86400_000) {
-                val ks = java.security.KeyStore.getInstance("AndroidCAStore")
-                ks.load(null)
-                val sb = StringBuilder()
-                val aliases = ks.aliases()
-                var n = 0
-                while (aliases.hasMoreElements()) {
-                    val c = ks.getCertificate(aliases.nextElement()) ?: continue
-                    val b64 = android.util.Base64.encodeToString(c.encoded, android.util.Base64.NO_WRAP)
-                    sb.append("-----BEGIN CERTIFICATE-----\n")
-                    var i = 0
-                    while (i < b64.length) { sb.append(b64, i, minOf(i + 64, b64.length)).append('\n'); i += 64 }
-                    sb.append("-----END CERTIFICATE-----\n")
-                    n++
-                }
-                val tmp = File(ctx.filesDir, "cacert.pem.tmp")
-                tmp.writeText(sb.toString())
-                tmp.renameTo(f)
-                log(1, "Кореневих сертифікатів для HTTPS: $n")
-            }
-            android.system.Os.setenv("SSL_CERT_FILE", f.path, true)
-        } catch (t: Throwable) {
-            log(2, "Не вдалося підготувати сертифікати для HTTPS: ${t.message}")
-        }
     }
 
     /** Зберігає дані відновлення, стан DHT і зупиняє сесію. Блокує потік рушія, але не головний. */
@@ -431,6 +396,9 @@ object Engine {
         b(settings_pack.bool_types.proxy_hostnames, p.bool("proxyHostnames"))
         b(settings_pack.bool_types.proxy_tracker_connections, true)
         b(settings_pack.bool_types.apply_ip_filter_to_trackers, p.bool("ipFilterEnabled") && p.bool("ipFilterTrackers"))
+        // OpenSSL у libtorrent4j для Android зібрано без файлового вводу-виводу, тож він не може прочитати
+        // кореневі сертифікати й будь-яка перевірка HTTPS-трекера завершилася б помилкою.
+        b(settings_pack.bool_types.validate_https_trackers, false)
         b(settings_pack.bool_types.announce_to_all_tiers, true)
         b(settings_pack.bool_types.announce_to_all_trackers, false)
         i(settings_pack.int_types.alert_queue_size, 5000)
@@ -729,7 +697,7 @@ object Engine {
             is ListenSucceededAlert -> log(1, "Прослуховування: ${a.address()}, порт ${a.socketType()}/${a.port()}")
             is ListenFailedAlert -> if (a.port() != 0) log(3, "Не вдалося прослуховувати ${a.address()}:${a.port()} — ${a.error().message}")
             is PortmapAlert -> log(1, "Переадресацію порту налаштовано: ${a.message()}")
-            is PortmapErrorAlert -> log(2, "Не вдалося переадресувати порт: ${a.message()}")
+            is PortmapErrorAlert -> if (trackerErrors.add("portmap|" + a.message())) log(2, "Не вдалося переадресувати порт: ${a.message()}")
             is ExternalIpAlert -> log(1, "Зовнішня IP-адреса: ${a.externalAddress()}")
             is FastresumeRejectedAlert -> {
                 val e = entries[idOf(a.handle().swig())]
