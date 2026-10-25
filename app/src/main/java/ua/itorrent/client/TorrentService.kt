@@ -86,6 +86,12 @@ class TorrentService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Кожен startForegroundService() має підтвердитися startForeground(), навіть якщо служба вже працює.
+        val n = build(if (Engine.started) "Itorrent" else "Запуск…", "")
+        if (Build.VERSION.SDK_INT >= 29) startForeground(NOTIF_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        else startForeground(NOTIF_ID, n)
+        lastText = ""
+        lastNotif = 0
         when (intent?.action) {
             ACTION_EXIT -> doExit()
             ACTION_STOP_ALL -> Engine.stopAll()
