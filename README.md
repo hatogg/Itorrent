@@ -4,13 +4,20 @@
 
 Торент-клієнт для Android на рушії libtorrent — за можливостями як Flud+, а з вигляду як класичний настільний qBittorrent: панель інструментів, таблиця передач із кольоровими станами, бічна панель фільтрів, нижня панель властивостей із вкладками і рядок стану зі швидкостями.
 
-[Завантажити APK](https://github.com/hatogg/Itorrent/raw/main/apk/Itorrent-1.0.apk)
+[Завантажити APK](https://github.com/hatogg/Itorrent/raw/main/apk/Itorrent-1.0.apk) · 18 МБ · Android 7.0 і новіші
 
 <p align="center">
-  <img src="docs/list.png" width="30%" alt="Список передач і вкладка «Загальне»">
-  <img src="docs/menu.png" width="30%" alt="Контекстне меню торента">
+  <img src="docs/list.png" width="30%" alt="Список передач і вкладка «Загальне» зі смугами частин і доступності">
+  <img src="docs/menu.png" width="30%" alt="Контекстне меню торента з підменю">
   <img src="docs/dark.png" width="30%" alt="Темна тема">
 </p>
+<p align="center">
+  <img src="docs/content.png" width="30%" alt="Вкладка «Вміст»: дерево файлів із прапорцями й прогресом">
+  <img src="docs/filters.png" width="30%" alt="Бічна панель фільтрів: стан, категорії, мітки, трекери">
+  <img src="docs/rss.png" width="30%" alt="RSS-канал і перегляд статті">
+</p>
+
+Скріншоти зроблено в емуляторі Android під час справжніх завантажень (Sintel через magnet-посилання та Ubuntu Server з торент-файлу).
 
 ## Що вміє
 
