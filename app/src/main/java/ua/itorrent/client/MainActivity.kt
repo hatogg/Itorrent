@@ -37,6 +37,7 @@ class MainActivity : Activity() {
     private val pending = ArrayList<Intent>()
     private var lastStorage: Boolean? = null
     private var lastDark: Boolean? = null
+    private var mySink: ((String, JSONObject) -> Unit)? = null
 
     companion object {
         const val REQ_TORRENT = 10
@@ -86,9 +87,12 @@ class MainActivity : Activity() {
         web.addJavascriptInterface(Bridge(), "Android")
         setContentView(web)
         setBars(dark)
-        Engine.sink = { t, d -> send(t, d) }
+        val sink: (String, JSONObject) -> Unit = { t, d -> send(t, d) }
+        mySink = sink
+        Engine.sink = sink
         web.loadUrl("file:///android_asset/www/index.html")
-        intent?.let { pending.add(it) }
+        // Після перестворення (зміна теми) початковий інтент уже оброблено.
+        if (savedInstanceState == null) intent?.let { pending.add(it) }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -126,7 +130,7 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
-        if (Engine.sink != null) Engine.sink = null
+        if (Engine.sink === mySink) Engine.sink = null
         super.onDestroy()
     }
 

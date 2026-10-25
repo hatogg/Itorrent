@@ -76,6 +76,8 @@ adb shell dumpsys notification --noredact | grep -B2 -A12 "pkg=ua.itorrent" | he
 adb shell cmd uimode night yes
 sleep 4
 shot 11_dark
+sleep 6
+shot 11_dark_b
 adb shell cmd uimode night no
 sleep 2
 # Вихід через меню: стан зберігається, процес завершується; далі торенти мають відновитися
