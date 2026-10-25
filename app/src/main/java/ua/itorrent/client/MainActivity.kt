@@ -100,15 +100,15 @@ class MainActivity : Activity() {
         if (ready) handleIntent(intent) else pending.add(intent)
     }
 
+    // pauseTimers() глобальний для всіх WebView процесу й ламає сторінку у вікні, перествореному після зміни теми,
+    // тож лише позначаємо сторінку прихованою: опитування рушія в інтерфейсі тоді засинає саме.
     override fun onStop() {
         super.onStop()
         web.onPause()
-        web.pauseTimers()
     }
 
     override fun onStart() {
         super.onStart()
-        web.resumeTimers()
         web.onResume()
     }
 

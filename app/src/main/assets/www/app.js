@@ -752,8 +752,8 @@
 
   function poll() {
     clearTimeout(pollT);
-    pollT = setTimeout(poll, 1000);
-    if (busy) return;
+    pollT = setTimeout(poll, document.hidden ? 3000 : 1000);
+    if (busy || document.hidden) return;
     busy = true;
     try {
       let r;
@@ -842,7 +842,8 @@
 
   // ---------------------------------------------------------------- запуск
   function start() {
-    try { INFO = api('init'); } catch (e) { document.body.textContent = 'Не вдалося запустити: ' + e.message; return; }
+    try { INFO = api('init'); } catch (e) { console.error('init: ' + e.message); document.body.textContent = 'Не вдалося запустити: ' + e.message; return; }
+    if (INFO.debug) console.log('ui start');
     P = INFO.prefs;
     loadUi();
     applyTheme();
@@ -855,5 +856,6 @@
     if (!P.firstRunDone) setTimeout(() => Dialogs.welcome(), 400);
   }
 
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollSoon(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
