@@ -139,7 +139,7 @@ object Details {
             val ae = v[i]
             // 0 працює, 1 оновлюється, 2 ще не зв'язувався, 3 не працює, 4 вимкнено
             var status = 4
-            var msg = ""
+            val msgs = LinkedHashSet<String>()
             var seeds = -1
             var leeches = -1
             var downloaded = -1
@@ -151,11 +151,11 @@ object Details {
                 for (ai in listOf(ep.get_infohash_v1(), ep.get_infohash_v2())) {
                     val s = aiStatus(ai)
                     if (status == 4 || rank(s) < rank(status)) status = s
-                    if (ai.getMessage().isNotBlank()) msg = ai.getMessage()
-                    else if (ai.getFails() > 0) {
+                    if (ai.getFails() > 0) {
                         val le = ai.getLast_error()
-                        if (le.value() != 0) msg = le.message()
+                        if (le.value() != 0) msgs.add(le.message())
                     }
+                    if (ai.getMessage().isNotBlank()) msgs.add(ai.getMessage())
                     seeds = maxOf(seeds, ai.getScrape_complete())
                     leeches = maxOf(leeches, ai.getScrape_incomplete())
                     downloaded = maxOf(downloaded, ai.getScrape_downloaded())
@@ -169,7 +169,7 @@ object Details {
             if (eps.size == 0) status = 2
             rows.put(
                 JSONObject().put("url", ae.getUrl()).put("tier", ae.getTier().toInt()).put("status", status)
-                    .put("msg", msg).put("seeds", seeds).put("leeches", leeches).put("downloaded", downloaded)
+                    .put("msg", msgs.joinToString("; ")).put("seeds", seeds).put("leeches", leeches).put("downloaded", downloaded)
                     .put("next", next)
             )
         }

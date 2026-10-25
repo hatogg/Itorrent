@@ -38,6 +38,14 @@ for i in $(seq 1 25); do
   if grep -q '"progress": 1' $OUT/state.json 2>/dev/null; then break; fi
 done
 shot 05_later
+# Створення торента з завантаженої папки і RSS-канал
+js "Android.call(\"create\",JSON.stringify({opts:{path:\"/storage/emulated/0/Download/Itorrent/Sintel\",pieceSize:0,format:\"v1\",priv:false,seed:false,trackers:\"udp://tracker.opentrackr.org:1337/announce\",webSeeds:\"\",comment:\"CI\",outDir:\"/storage/emulated/0/Download\"}}))" 8
+js "Android.call(\"rss.addFeed\",JSON.stringify({url:\"https://distrowatch.com/news/torrents.xml\",name:\"DistroWatch\"}))" 15
+js "It.setTab(\"rss\")" 3
+shot 05_rss
+js "document.querySelectorAll(\".rss-feed\")[1].click()" 2
+shot 05_rss_feed
+js "It.setTab(\"transfers\")" 1
 # Перегляд під час завантаження: локальний HTTP-сервер віддає діапазони байтів
 SPORT=$(grep -o '"sport": [0-9]*' $OUT/state.json | grep -o '[0-9]*$')
 SID=$(python3 -c "import json;d=json.load(open('$OUT/state.json'));print([t['id'] for t in d['t'] if t['name']=='Sintel'][0])" 2>/dev/null)

@@ -42,6 +42,7 @@ import org.libtorrent4j.alerts.TorrentDeleteFailedAlert
 import org.libtorrent4j.alerts.TorrentErrorAlert
 import org.libtorrent4j.alerts.TorrentFinishedAlert
 import org.libtorrent4j.alerts.TorrentRemovedAlert
+import org.libtorrent4j.alerts.TrackerErrorAlert
 import org.libtorrent4j.alerts.UrlSeedAlert
 import org.libtorrent4j.swig.add_torrent_params
 import org.libtorrent4j.swig.address
@@ -607,7 +608,7 @@ object Engine {
         AlertType.LISTEN_SUCCEEDED.swig(), AlertType.LISTEN_FAILED.swig(), AlertType.PORTMAP.swig(),
         AlertType.PORTMAP_ERROR.swig(), AlertType.EXTERNAL_IP.swig(), AlertType.FASTRESUME_REJECTED.swig(),
         AlertType.PIECE_FINISHED.swig(), AlertType.FILE_RENAMED.swig(), AlertType.FILE_RENAME_FAILED.swig(),
-        AlertType.SESSION_ERROR.swig(), AlertType.PERFORMANCE.swig(), AlertType.URL_SEED.swig()
+        AlertType.SESSION_ERROR.swig(), AlertType.URL_SEED.swig(), AlertType.TRACKER_ERROR.swig()
     )
 
     private val listener = object : AlertListener {
@@ -632,6 +633,7 @@ object Engine {
 
     private var lastPerfLog = 0L
     private val seedErrors = java.util.Collections.synchronizedSet(HashSet<String>())
+    private val trackerErrors = java.util.Collections.synchronizedSet(HashSet<String>())
 
     private fun onAlert(a: Alert<*>) {
         when (a) {
@@ -746,6 +748,14 @@ object Engine {
                 emit("error", JSONObject().put("msg", msg))
             }
             is SessionErrorAlert -> log(3, "Помилка сесії: ${a.message()}")
+            is TrackerErrorAlert -> {
+                val key = a.trackerUrl() + "|" + a.error().message
+                if (trackerErrors.add(key)) {
+                    val e = entries[idOf(a.handle().swig())]
+                    val msg = a.errorMessage().ifBlank { a.error().message }
+                    log(2, "Трекер ${a.trackerUrl().take(100)} («${nameOf(e)}»): $msg")
+                }
+            }
             is UrlSeedAlert -> {
                 val key = a.serverUrl()
                 if (seedErrors.add(key)) {
