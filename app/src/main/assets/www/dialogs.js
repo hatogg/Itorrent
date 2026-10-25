@@ -130,11 +130,18 @@
 
     fillInfo(info);
     fillContent(info);
-    addOpen = { pid: info.pid, update: (d) => { fillInfo(d); fillContent(d); if (nameIn.value === info.name || nameIn.value === info.id) nameIn.value = d.name; info = d; } };
+    let titleEl = null;
+    addOpen = { pid: info.pid, update: (d) => {
+      fillInfo(d); fillContent(d);
+      if (nameIn.value === info.name || nameIn.value === info.id) nameIn.value = d.name;
+      if (titleEl) titleEl.textContent = d.name;
+      info = d;
+    } };
 
     let done = false;
     dialog({
       title: info.name, icon: I.addFile, body, wide: true, modal: true,
+      ready: ({ title }) => { titleEl = title.querySelector('.t'); },
       buttons: [
         { label: 'Скасувати' },
         { label: 'Гаразд', primary: true, action: () => {

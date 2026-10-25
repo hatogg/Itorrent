@@ -504,6 +504,6 @@ input.field { user-select: text; -webkit-user-select: text; }
 .stat-table tr.h td { font-weight: 600; padding-top: 12px; border-bottom-color: var(--line); }
 
 @media (min-width: 760px) {
-  .props .ptab { flex-direction: row; gap: 6px; font-size: 12px; }
-  .props .ptabs { height: 36px; }
+  .ptab { flex-direction: row; gap: 6px; font-size: 12px; }
+  .ptabs { height: 38px; }
 }

@@ -42,6 +42,7 @@ import org.libtorrent4j.alerts.TorrentDeleteFailedAlert
 import org.libtorrent4j.alerts.TorrentErrorAlert
 import org.libtorrent4j.alerts.TorrentFinishedAlert
 import org.libtorrent4j.alerts.TorrentRemovedAlert
+import org.libtorrent4j.alerts.UrlSeedAlert
 import org.libtorrent4j.swig.add_torrent_params
 import org.libtorrent4j.swig.address
 import org.libtorrent4j.swig.alert
@@ -257,6 +258,7 @@ object Engine {
             ?: SessionParams()
         params.setSettings(sp)
         params.setPosixDiskIO()
+        installCaBundle()
         sm.addListener(listener)
         sm.start(params)
         sm.applySettings(settingsPack())
@@ -271,6 +273,40 @@ object Engine {
         rss.start()
         ticker = exec.scheduleWithFixedDelay({ tick() }, 1000, 1000, TimeUnit.MILLISECONDS)
         readyLatch.countDown()
+    }
+
+    /**
+     * Вбудований у libtorrent OpenSSL не знає, де Android тримає кореневі сертифікати,
+     * тож HTTPS-трекери й веб-сіди не проходили б перевірку. Збираємо системні сертифікати
+     * в один PEM-файл і показуємо його OpenSSL через SSL_CERT_FILE.
+     */
+    private fun installCaBundle() {
+        try {
+            val f = File(ctx.filesDir, "cacert.pem")
+            if (!f.exists() || f.length() < 1000 || System.currentTimeMillis() - f.lastModified() > 3L * 86400_000) {
+                val ks = java.security.KeyStore.getInstance("AndroidCAStore")
+                ks.load(null)
+                val sb = StringBuilder()
+                val aliases = ks.aliases()
+                var n = 0
+                while (aliases.hasMoreElements()) {
+                    val c = ks.getCertificate(aliases.nextElement()) ?: continue
+                    val b64 = android.util.Base64.encodeToString(c.encoded, android.util.Base64.NO_WRAP)
+                    sb.append("-----BEGIN CERTIFICATE-----\n")
+                    var i = 0
+                    while (i < b64.length) { sb.append(b64, i, minOf(i + 64, b64.length)).append('\n'); i += 64 }
+                    sb.append("-----END CERTIFICATE-----\n")
+                    n++
+                }
+                val tmp = File(ctx.filesDir, "cacert.pem.tmp")
+                tmp.writeText(sb.toString())
+                tmp.renameTo(f)
+                log(1, "Кореневих сертифікатів для HTTPS: $n")
+            }
+            android.system.Os.setenv("SSL_CERT_FILE", f.path, true)
+        } catch (t: Throwable) {
+            log(2, "Не вдалося підготувати сертифікати для HTTPS: ${t.message}")
+        }
     }
 
     /** Зберігає дані відновлення, стан DHT і зупиняє сесію. Блокує потік рушія, але не головний. */
@@ -571,7 +607,7 @@ object Engine {
         AlertType.LISTEN_SUCCEEDED.swig(), AlertType.LISTEN_FAILED.swig(), AlertType.PORTMAP.swig(),
         AlertType.PORTMAP_ERROR.swig(), AlertType.EXTERNAL_IP.swig(), AlertType.FASTRESUME_REJECTED.swig(),
         AlertType.PIECE_FINISHED.swig(), AlertType.FILE_RENAMED.swig(), AlertType.FILE_RENAME_FAILED.swig(),
-        AlertType.SESSION_ERROR.swig(), AlertType.PERFORMANCE.swig()
+        AlertType.SESSION_ERROR.swig(), AlertType.PERFORMANCE.swig(), AlertType.URL_SEED.swig()
     )
 
     private val listener = object : AlertListener {
@@ -595,6 +631,7 @@ object Engine {
     }
 
     private var lastPerfLog = 0L
+    private val seedErrors = java.util.Collections.synchronizedSet(HashSet<String>())
 
     private fun onAlert(a: Alert<*>) {
         when (a) {
@@ -688,7 +725,7 @@ object Engine {
                 emit("error", JSONObject().put("msg", msg))
             }
             is ListenSucceededAlert -> log(1, "Прослуховування: ${a.address()}, порт ${a.socketType()}/${a.port()}")
-            is ListenFailedAlert -> log(3, "Не вдалося прослуховувати ${a.address()}:${a.port()} — ${a.error().message}")
+            is ListenFailedAlert -> if (a.port() != 0) log(3, "Не вдалося прослуховувати ${a.address()}:${a.port()} — ${a.error().message}")
             is PortmapAlert -> log(1, "Переадресацію порту налаштовано: ${a.message()}")
             is PortmapErrorAlert -> log(2, "Не вдалося переадресувати порт: ${a.message()}")
             is ExternalIpAlert -> log(1, "Зовнішня IP-адреса: ${a.externalAddress()}")
@@ -709,6 +746,13 @@ object Engine {
                 emit("error", JSONObject().put("msg", msg))
             }
             is SessionErrorAlert -> log(3, "Помилка сесії: ${a.message()}")
+            is UrlSeedAlert -> {
+                val key = a.serverUrl()
+                if (seedErrors.add(key)) {
+                    val msg = a.errorMessage().ifBlank { a.error().message }
+                    log(2, "Веб-сід ${key.take(120)} не відповідає: $msg")
+                }
+            }
             is TorrentAlert<*> -> {
                 if (a.type() == AlertType.PERFORMANCE) {
                     val now = System.currentTimeMillis()
@@ -1444,6 +1488,7 @@ object Engine {
                 .put("ip", sm.externalAddress() ?: "")
                 .put("storage", hasStorageAccess())
                 .put("downloading", downloading)
+                .put("sport", streamer.port)
             if (tickNo % 60 == 0L) {
                 saveStats()
                 for (e in entries.values) e.th?.let { if (it.is_valid() && it.need_save_resume_data()) it.save_resume_data(torrent_handle.save_info_dict) }
@@ -1521,8 +1566,8 @@ object Engine {
             .put("progress", st.getProgress().toDouble())
             .put("state", state)
             .put("dl", dlr).put("ul", ulr)
-            .put("seeds", st.getNum_seeds()).put("seedsT", st.getNum_complete())
-            .put("peers", (st.getNum_peers() - st.getNum_seeds()).coerceAtLeast(0)).put("peersT", st.getNum_incomplete())
+            .put("seeds", st.getNum_seeds()).put("seedsT", maxOf(st.getNum_complete(), st.getList_seeds()))
+            .put("peers", (st.getNum_peers() - st.getNum_seeds()).coerceAtLeast(0)).put("peersT", maxOf(st.getNum_incomplete(), st.getList_peers() - st.getList_seeds()))
             .put("eta", eta)
             .put("ratio", ratio)
             .put("cat", e.meta.category)

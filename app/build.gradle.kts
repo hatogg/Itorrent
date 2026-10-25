@@ -44,7 +44,7 @@ android {
     buildFeatures { buildConfig = true }
 
     packaging {
-        jniLibs { useLegacyPackaging = false }
+        jniLibs { useLegacyPackaging = true }
     }
 
     compileOptions {

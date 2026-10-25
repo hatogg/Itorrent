@@ -19,7 +19,7 @@ adb logcat -c
 adb shell am start -n $ACT --ez skipWelcome true --es autoAdd "$T1"
 sleep 8
 shot 01_start
-adb shell am start -n $ACT --es autoAdd "$T2"
+adb shell am start -n $ACT --es autoAdd "'$T2'"
 sleep 25
 shot 02_list
 js "document.querySelector(\"tbody tr\").click()" 3
@@ -35,6 +35,14 @@ for i in $(seq 1 25); do
   if grep -q '"progress": 1' $OUT/state.json 2>/dev/null; then break; fi
 done
 shot 05_later
+# Перегляд під час завантаження: локальний HTTP-сервер віддає діапазони байтів
+SPORT=$(grep -o '"sport": [0-9]*' $OUT/state.json | grep -o '[0-9]*$')
+SID=$(python3 -c "import json;d=json.load(open('$OUT/state.json'));print([t['id'] for t in d['t'] if t['name']=='Sintel'][0])" 2>/dev/null)
+echo "port=$SPORT id=$SID" > $OUT/stream.txt
+for idx in 0 1 2 3 4 5 6 7 8; do
+  echo "== file $idx" >> $OUT/stream.txt
+  adb shell "printf 'GET /$SID/$idx/f HTTP/1.1\r\nHost: x\r\nRange: bytes=0-15\r\n\r\n' | nc -w 5 127.0.0.1 $SPORT" 2>&1 | head -c 400 | od -c | head -20 >> $OUT/stream.txt
+done
 # меню торента і бічна панель
 js "It.S.sel=new Set([It.S.rows[0].id]);It.S.focus=It.S.rows[0].id;document.querySelector(\"tbody tr\").dispatchEvent(new MouseEvent(\"contextmenu\",{bubbles:true,clientX:120,clientY:200}))" 2
 shot 06_menu
@@ -75,7 +83,7 @@ sleep 6
 shot 13_release_welcome
 adb shell input keyevent 4
 sleep 1
-adb shell am start -a android.intent.action.VIEW -d "$T2" -n $ACT
+adb shell am start -a android.intent.action.VIEW -d "'$T2'" -n $ACT
 sleep 10
 shot 14_release_add
 adb logcat -d > $OUT/logcat_all.txt 2>&1 || true

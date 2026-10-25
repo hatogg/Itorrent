@@ -87,8 +87,20 @@ class MainActivity : Activity() {
         if (ready) handleIntent(intent) else pending.add(intent)
     }
 
+    override fun onPause() {
+        super.onPause()
+        web.onPause()
+        web.pauseTimers()
+    }
+
     override fun onResume() {
         super.onResume()
+        web.resumeTimers()
+        web.onResume()
+        checkStorage()
+    }
+
+    private fun checkStorage() {
         val s = Engine.hasStorageAccess()
         if (lastStorage != null && lastStorage != s) {
             send("storage", JSONObject().put("granted", s).put("savePath", Engine.defaultSavePath()))
@@ -240,7 +252,7 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         @Suppress("DEPRECATION")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        onResume()
+        checkStorage()
     }
 
     private fun openUrl(url: String) {
