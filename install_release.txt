@@ -1,0 +1,9 @@
+Performing Streamed Install
+Success
+Starting: Intent { cmp=ua.itorrent.client/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: ua.itorrent.client/.MainActivity
+TotalTime: 915
+WaitTime: 941
+Complete

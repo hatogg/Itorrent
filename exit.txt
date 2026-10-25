@@ -1,0 +1,8 @@
+after exit pid: 
+total 320
+drwx------ 2 u0_a141 u0_a141   4096 2026-10-25 14:01 .
+drwxrwx--x 3 u0_a141 u0_a141   4096 2026-10-25 14:01 ..
+-rw------- 1 u0_a141 u0_a141    520 2026-10-25 13:59 08ada5a7a6183aae1e09d831df6748d566095a10.json
+-rw------- 1 u0_a141 u0_a141  21817 2026-10-25 14:01 08ada5a7a6183aae1e09d831df6748d566095a10.resume
+-rw------- 1 u0_a141 u0_a141    318 2026-10-25 13:57 a1dfefec1a9dd7fa8a041ebeeea271db55126d2f.json
+-rw------- 1 u0_a141 u0_a141 258261 2026-10-25 14:01 a1dfefec1a9dd7fa8a041ebeeea271db55126d2f.resume

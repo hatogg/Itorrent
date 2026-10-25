@@ -1,0 +1,18 @@
+/sdcard/Download/Itorrent:
+total 1044176
+drwxrws--- 2 u0_a128 media_rw       4096 2026-10-25 13:59 Sintel
+-rw-rw---- 1 u0_a128 media_rw 3259760640 2026-10-25 14:00 ubuntu-24.04.3-live-server-amd64.iso
+
+/sdcard/Download/Itorrent/Sintel:
+total 126348
+-rw-rw---- 1 u0_a128 media_rw      1652 2026-10-25 13:58 Sintel.de.srt
+-rw-rw---- 1 u0_a128 media_rw      1514 2026-10-25 13:58 Sintel.en.srt
+-rw-rw---- 1 u0_a128 media_rw      1554 2026-10-25 13:58 Sintel.es.srt
+-rw-rw---- 1 u0_a128 media_rw      1618 2026-10-25 13:58 Sintel.fr.srt
+-rw-rw---- 1 u0_a128 media_rw      1546 2026-10-25 13:58 Sintel.it.srt
+-rw-rw---- 1 u0_a128 media_rw 129241752 2026-10-25 13:59 Sintel.mp4
+-rw-rw---- 1 u0_a128 media_rw      1537 2026-10-25 13:59 Sintel.nl.srt
+-rw-rw---- 1 u0_a128 media_rw      1536 2026-10-25 13:59 Sintel.pl.srt
+-rw-rw---- 1 u0_a128 media_rw      1551 2026-10-25 13:59 Sintel.pt.srt
+-rw-rw---- 1 u0_a128 media_rw      2016 2026-10-25 13:59 Sintel.ru.srt
+-rw-rw---- 1 u0_a128 media_rw     46115 2026-10-25 13:59 poster.jpg

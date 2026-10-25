@@ -1,0 +1,192 @@
+{
+  "s": {
+    "dl": 9660714,
+    "ul": 0,
+    "dlS": 1187113791,
+    "ulS": 40705998,
+    "dht": 289,
+    "conn": "online",
+    "alt": false,
+    "dlLim": 0,
+    "ulLim": 0,
+    "pause": "",
+    "free": 4744462336,
+    "port": 53776,
+    "ip": "172.185.143.247",
+    "storage": true,
+    "downloading": 1,
+    "sport": 39395
+  },
+  "t": [
+    {
+      "id": "08ada5a7a6183aae1e09d831df6748d566095a10",
+      "name": "Sintel",
+      "size": 129302391,
+      "total": 129302391,
+      "progress": 1,
+      "state": "stalledUP",
+      "dl": 10,
+      "ul": 0,
+      "seeds": 0,
+      "seedsT": 217,
+      "peers": 1,
+      "peersT": 273,
+      "eta": -1,
+      "ratio": 0,
+      "cat": "",
+      "tags": [],
+      "added": 1792936681179,
+      "completed": 1792936777000,
+      "path": "\/storage\/emulated\/0\/Download\/Itorrent",
+      "dlAll": 132806187,
+      "ulAll": 0,
+      "dlS": 132806187,
+      "ulS": 0,
+      "left": 0,
+      "active": 169,
+      "seeding": 72,
+      "seq": false,
+      "fl": false,
+      "superSeed": false,
+      "dlLim": 0,
+      "ulLim": 0,
+      "tracker": "udp:\/\/tracker.opentrackr.org:1337",
+      "lastAct": 0,
+      "queue": -1,
+      "meta": true,
+      "err": "",
+      "priv": false,
+      "ratioLim": -2,
+      "seedLim": -2,
+      "conns": 14
+    },
+    {
+      "id": "a1dfefec1a9dd7fa8a041ebeeea271db55126d2f",
+      "name": "ubuntu-24.04.3-live-server-amd64.iso",
+      "size": 3303444480,
+      "total": 3303444480,
+      "progress": 0.3016270101070404,
+      "state": "downloading",
+      "dl": 9660704,
+      "ul": 0,
+      "seeds": 88,
+      "seedsT": 121,
+      "peers": 2,
+      "peersT": 417,
+      "eta": 249,
+      "ratio": 0,
+      "cat": "",
+      "tags": [],
+      "added": 1792936676608,
+      "completed": 0,
+      "path": "\/storage\/emulated\/0\/Download\/Itorrent",
+      "dlAll": 1007167603,
+      "ulAll": 0,
+      "dlS": 1013104301,
+      "ulS": 0,
+      "left": 2307035136,
+      "active": 174,
+      "seeding": 0,
+      "seq": false,
+      "fl": false,
+      "superSeed": false,
+      "dlLim": 0,
+      "ulLim": 0,
+      "tracker": "",
+      "lastAct": 0,
+      "queue": 0,
+      "meta": true,
+      "err": "",
+      "priv": false,
+      "ratioLim": -2,
+      "seedLim": -2,
+      "conns": 99
+    }
+  ],
+  "tr": {
+    "Sintel": {
+      "list": [
+        {
+          "url": "udp:\/\/explodie.org:6969",
+          "tier": 0,
+          "status": 3,
+          "msg": "timed out",
+          "seeds": -1,
+          "leeches": -1,
+          "downloaded": -1,
+          "next": 55
+        },
+        {
+          "url": "udp:\/\/tracker.opentrackr.org:1337",
+          "tier": 1,
+          "status": 0,
+          "msg": "skipping tracker announce (unreachable)",
+          "seeds": 217,
+          "leeches": 63,
+          "downloaded": -1,
+          "next": 131
+        },
+        {
+          "url": "udp:\/\/tracker.openbittorrent.com:6969",
+          "tier": 2,
+          "status": 3,
+          "msg": "Host not found (authoritative)",
+          "seeds": -1,
+          "leeches": -1,
+          "downloaded": -1,
+          "next": 131
+        }
+      ],
+      "dht": {
+        "on": true,
+        "peers": 8
+      },
+      "pex": {
+        "on": true,
+        "peers": 4
+      },
+      "lsd": {
+        "on": true,
+        "peers": 0
+      },
+      "priv": false
+    },
+    "ubuntu-24.04.3-live-server-amd64.iso": {
+      "list": [
+        {
+          "url": "https:\/\/torrent.ubuntu.com\/announce",
+          "tier": 0,
+          "status": 3,
+          "msg": "tracker sent a failure message; Requested download is not authorized for use with this tracker.; Network is unreachable",
+          "seeds": -1,
+          "leeches": -1,
+          "downloaded": -1,
+          "next": 13
+        },
+        {
+          "url": "https:\/\/ipv6.torrent.ubuntu.com\/announce",
+          "tier": 1,
+          "status": 3,
+          "msg": "tracker sent a failure message; Requested download is not authorized for use with this tracker.; Network is unreachable",
+          "seeds": -1,
+          "leeches": -1,
+          "downloaded": -1,
+          "next": 13
+        }
+      ],
+      "dht": {
+        "on": true,
+        "peers": 91
+      },
+      "pex": {
+        "on": true,
+        "peers": 27
+      },
+      "lsd": {
+        "on": true,
+        "peers": 0
+      },
+      "priv": false
+    }
+  }
+}

@@ -1,0 +1,21 @@
+0 Itorrent 1.0 запущено
+1 libtorrent 2.1.0.0
+1 Прослуховування: 0.0.0.0, порт TCP/53776
+1 Прослуховування: 0.0.0.0, порт UTP/53776
+1 Прослуховування: ::, порт TCP/53776
+1 Прослуховування: ::, порт UTP/53776
+1 Зовнішня IP-адреса: 172.185.143.247
+0 Додано торент: ubuntu-24.04.3-live-server-amd64.iso
+2 Трекер https://torrent.ubuntu.com/announce («ubuntu-24.04.3-live-server-amd64.iso»): Network is unreachable
+2 Трекер https://ipv6.torrent.ubuntu.com/announce («ubuntu-24.04.3-live-server-amd64.iso»): Network is unreachable
+2 Трекер https://torrent.ubuntu.com/announce («ubuntu-24.04.3-live-server-amd64.iso»): Requested download is not authorized for use with this tracker.
+2 Трекер https://ipv6.torrent.ubuntu.com/announce («ubuntu-24.04.3-live-server-amd64.iso»): Requested download is not authorized for use with this tracker.
+0 Додано торент: 08ada5a7a6183aae1e09d831df6748d566095a10
+2 Трекер udp://tracker.opentrackr.org:1337 («08ada5a7a6183aae1e09d831df6748d566095a10»): skipping tracker announce (unreachable)
+0 Отримано метадані: Sintel
+2 Трекер udp://tracker.openbittorrent.com:6969 («Sintel»): timed out
+2 Трекер udp://explodie.org:6969 («Sintel»): timed out
+2 Трекер udp://tracker.openbittorrent.com:6969 («Sintel»): Host not found (authoritative)
+0 Завантаження завершено: Sintel
+0 Створено торент-файл: /storage/emulated/0/Download/Sintel.torrent
+2 Не вдалося переадресувати порт: could not map port using UPnP[0.0.0.0]: no router found

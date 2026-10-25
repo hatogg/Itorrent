@@ -1,0 +1,56 @@
+Current Notification Manager state:
+  Notification List:
+    NotificationRecord(0x0f9aac41: pkg=ua.itorrent.client user=UserHandle{0} id=2147483647 tag=ranker_group importance=3 key=0|ua.itorrent.client|2147483647|ranker_group|10141|ranker_group: Notification(channel=finished shortcut=null contentView=null vibrate=null sound=null defaults=0x0 flags=0x722 color=0xff1a7f37 groupKey=ranker_group vis=PRIVATE))
+      uid=10141 userId=0
+      opPkg=ua.itorrent.client
+      icon=Icon(typ=RESOURCE pkg=ua.itorrent.client id=0x7f020004)
+      flags=0x722
+      originalFlags=0x722
+      pri=0
+      key=0|ua.itorrent.client|2147483647|ranker_group|10141|ranker_group
+      seen=false
+      groupKey=0|ua.itorrent.client|g:ranker_group
+      notification=
+            fullscreenIntent=null
+            contentIntent=PendingIntent{9d55e6: PendingIntentRecord{6719416 ua.itorrent.client startActivity}}
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=2
+--
+      shortcut=null found valid? false
+      mUserVisOverride=-1000
+    NotificationRecord(0x019cadd4: pkg=ua.itorrent.client user=UserHandle{0} id=100 tag=null importance=3 key=0|ua.itorrent.client|100|null|10141: Notification(channel=finished shortcut=null contentView=null vibrate=null sound=null defaults=0x0 flags=0x10 color=0xff1a7f37 vis=PRIVATE))
+      uid=10141 userId=0
+      opPkg=ua.itorrent.client
+      icon=Icon(typ=RESOURCE pkg=ua.itorrent.client id=0x7f020004)
+      flags=0x10
+      originalFlags=0x10
+      pri=0
+      key=0|ua.itorrent.client|100|null|10141
+      seen=false
+      groupKey=0|ua.itorrent.client|g:ranker_group
+      notification=
+            fullscreenIntent=null
+            contentIntent=PendingIntent{2a4cb7d: PendingIntentRecord{90e2de9 ua.itorrent.client startActivity (allowlist: adb5a3a:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+--
+      shortcut=null found valid? false
+      mUserVisOverride=-1000
+    NotificationRecord(0x05d8ea72: pkg=ua.itorrent.client user=UserHandle{0} id=1 tag=null importance=2 key=0|ua.itorrent.client|1|null|10141: Notification(channel=transfers shortcut=null contentView=null vibrate=null sound=null defaults=0x0 flags=0x6a color=0xff1f6feb actions=2 vis=PRIVATE))
+      uid=10141 userId=0
+      opPkg=ua.itorrent.client
+      icon=Icon(typ=RESOURCE pkg=ua.itorrent.client id=0x7f020003)
+      flags=0x6a
+      originalFlags=0x4a
+      pri=0
+      key=0|ua.itorrent.client|1|null|10141
+      seen=false
+      groupKey=0|ua.itorrent.client|g:ranker_group
+      notification=
+            fullscreenIntent=null
+            contentIntent=PendingIntent{af6bec3: PendingIntentRecord{1b68fa9 ua.itorrent.client startActivity (allowlist: adb5a3a:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
